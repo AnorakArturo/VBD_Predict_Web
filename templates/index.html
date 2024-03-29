@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vector-Borne Disease Prediction</title>
+    <link rel="stylesheet" href="static\styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">    
+</head>
+
+<body>
+    <div id="container">
+        <h1>Vector-Borne Disease Prediction</h1>
+        <p>Enter your symptoms to predict the vector-borne disease:</p>
+        <input type="text" id="symptom-search" oninput="filterSymptoms()" placeholder="Search symptoms...">
+
+        <!-- Show Entire List button -->
+        <button id="show-all-btn">Show Entire List</button>
+
+        <!-- Symptoms list -->
+        <ul id="symptoms-list"></ul>
+
+        <!-- Selected symptoms list -->
+        <div id="selected-symptoms">
+            <p>Selected Symptoms:</p>
+            <ul id="selected-symptoms-list"></ul>
+        </div>
+        
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" style="display: none;">Loading...</div>
+
+        <button id="predict-btn">Predict</button>
+        <div id="result"></div>
+    </div>
+
+    <script src="static\script.js"></script>
+</body>
+
+</html>
