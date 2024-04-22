@@ -12,15 +12,17 @@ document.addEventListener('DOMContentLoaded', function () {
         "Ulcers", "Toenail Loss", "Speech Problem", "Bullseye Rash"
     ];
 
+    const sortedSymptoms = [...symptoms].sort(); // Sorted copy of symptoms array
+
     let showList = false;
 
     function filterSymptoms() {
         const searchTerm = document.getElementById('symptom-search').value.toLowerCase();
-        const filteredSymptoms = symptoms.filter(symptom => symptom.toLowerCase().includes(searchTerm));
-    
+        const filteredSymptoms = sortedSymptoms.filter(symptom => symptom.toLowerCase().includes(searchTerm));
+
         const symptomsList = document.getElementById('symptoms-list');
         symptomsList.innerHTML = ''; // Clear the previous contents of the symptoms list
-    
+
         filteredSymptoms.forEach(symptom => {
             const symptomItem = document.createElement('li');
             symptomItem.textContent = symptom;
@@ -31,13 +33,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
     
-    function addSymptomToForm(symptom) {
-        const selectedSymptomsList = document.getElementById('selected-symptoms-list');
-        const selectedSymptomItem = createSymptomListItem(symptom); // Create list item with symptom text and remove button
-        selectedSymptomsList.appendChild(selectedSymptomItem);
-        updateSearchField(symptom); // Update search field with the selected symptom
-    }
-
     function addSymptomToForm(symptom) {
         const selectedSymptomsList = document.getElementById('selected-symptoms-list');
     
@@ -67,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Update the value of the search field with the selected symptom
         const searchField = document.getElementById('symptom-search');
         searchField.value = symptom;
-    }    
+    }
 
     function updateSearchField(symptom) {
         // Update the value of the search field with the selected symptom
@@ -208,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Call filterSymptoms() when the page loads to populate the symptom list initially
     filterSymptoms();
-    
+
      // Attach event listener for the 'oninput' event of the search box
      document.getElementById('symptom-search').addEventListener('input', filterSymptoms);
 });
