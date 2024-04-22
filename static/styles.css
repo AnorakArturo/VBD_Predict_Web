@@ -84,6 +84,12 @@ button:hover {
 #result p {
     margin-bottom: 10px;
 }
+
+#selected-symptoms-list {
+    list-style-type: none;
+    padding: 0;
+}
+
 .selected-symptom-box {
     display: inline-block;
     background-color: #007bff;
@@ -92,6 +98,12 @@ button:hover {
     border-radius: 4px;
     margin-right: 5px;
 }
+
+.remove-button {
+    cursor: pointer;
+    margin-left: 5px;
+}
+
 
 .remove-button {
     cursor: pointer;

@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app)  # Enable CORS for the API
 
 # Load the trained model
-loaded_rf_model = joblib.load('random_forest.joblib')
+loaded_rf_model = joblib.load('model.joblib')   # Naive Bayes Model
 
 # Load the inverse mapping
 inv_mapping = {
