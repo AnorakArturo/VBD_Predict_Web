@@ -33,6 +33,20 @@
         <button id="predict-btn">Predict</button>
         <div id="result"></div>
     </div>
+    <div id="container">
+        <!-- Explanation box -->
+        <div id="explanation-box">
+            <h3>Explanation:</h3>
+            <p>The disease prediction is based on the symptoms you entered.</p>
+            <p>The <strong>Confidence Level</strong> indicates how confident the model is in its prediction.</p>
+            <p>Each symptom is shown with a number:</p>
+            <ul>
+                <li>A <strong>positive number</strong> indicates that the presence of the symptom supports the prediction.</li>
+                <li>A <strong>negative number</strong> indicates that the absence of the symptom supports the prediction.</li>
+            </ul>
+            <div id="explanation-content"></div>
+        </div>
+    </div>
 
     <script src="static\script.js"></script>
 </body>

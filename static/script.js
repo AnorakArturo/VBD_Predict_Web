@@ -17,10 +17,10 @@ document.addEventListener('DOMContentLoaded', function () {
     function filterSymptoms() {
         const searchTerm = document.getElementById('symptom-search').value.toLowerCase();
         const filteredSymptoms = symptoms.filter(symptom => symptom.toLowerCase().includes(searchTerm));
-
+    
         const symptomsList = document.getElementById('symptoms-list');
-        symptomsList.innerHTML = '';
-
+        symptomsList.innerHTML = ''; // Clear the previous contents of the symptoms list
+    
         filteredSymptoms.forEach(symptom => {
             const symptomItem = document.createElement('li');
             symptomItem.textContent = symptom;
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
             symptomsList.appendChild(symptomItem);
         });
     }
-
+    
     function addSymptomToForm(symptom) {
         const selectedSymptomsList = document.getElementById('selected-symptoms-list');
         const selectedSymptomItem = createSymptomListItem(symptom); // Create list item with symptom text and remove button
@@ -78,21 +78,28 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('predict-btn').addEventListener('click', async () => {
         const selectedSymptoms = Array.from(document.querySelectorAll('.selected-symptom-box'));
         const symptoms = selectedSymptoms.map(symptomBox => symptomBox.textContent.trim());
-
-        const response = await fetch('http://localhost:5000/predict', {
+    
+        const response = await fetch('/predict', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ symptoms })
         });
-
+    
         const result = await response.json();
         document.getElementById('result').innerHTML = `
-        <p>Diagnosis: ${result.diagnosis}</p>
-        <p>Confidence Level: ${result.confidence_level}</p>
-    `;
+            <p>Diagnosis: ${result.diagnosis}</p>
+            <p>Confidence Level: ${result.confidence_level}</p>
+        `;
+        
+        // Display explanation if available
+        if (result.explanation) {
+            const explanationHTML = result.explanation.map(([symptom, weight]) => `<p>${symptom}: ${weight}</p>`).join('');
+            document.getElementById('result').innerHTML += `<div><h3>Explanation:</h3>${explanationHTML}</div>`;
+        }
     });
+
 
     // Hide the symptom list by default when the page loads
     window.onload = function () {
@@ -201,4 +208,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Call filterSymptoms() when the page loads to populate the symptom list initially
     filterSymptoms();
+    
+     // Attach event listener for the 'oninput' event of the search box
+     document.getElementById('symptom-search').addEventListener('input', filterSymptoms);
 });
