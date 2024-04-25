@@ -6,10 +6,10 @@ import lime
 from lime import lime_tabular
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for the API
+CORS(app)   # Enable CORS for the API
 
 # Load the trained model
-loaded_rf_model = joblib.load('model.joblib')   # Naive Bayes Model
+model = joblib.load('model.joblib')     # NB
 
 # Load the inverse mapping
 inv_mapping = {
@@ -50,8 +50,9 @@ def predict():
     symptoms_request = request.json['symptoms']
     # Encode the symptoms into a binary vector
     input_vector = np.array([1 if symptom in symptoms_request else 0 for symptom in symptoms]).reshape(1, -1)
+
     # Use the trained model to predict probabilities for the symptoms
-    predicted_probabilities = loaded_rf_model.predict_proba(input_vector)[0]
+    predicted_probabilities = model.predict_proba(input_vector)[0]
 
     # Predicted disease for custom symptoms
     predicted_disease_custom = inv_mapping[np.argmax(predicted_probabilities)]
@@ -62,9 +63,9 @@ def predict():
                                                    class_names=list(inv_mapping.values()),
                                                    mode="classification")
 
-    # Define a function to make predictions with your model
+    # Fn defn to make predictions with model
     def predict_fn(x):
-        return loaded_rf_model.predict_proba(x)
+        return model.predict_proba(x)
 
     # Get the explanation for the predicted class
     explanation = explainer.explain_instance(data_row=input_vector[0],
@@ -72,8 +73,8 @@ def predict():
                                              num_features=len(symptoms),
                                              top_labels=1)
 
-    # Filter out features with importance between -0.001 and 0.001 (inclusive), except for the custom symptoms
-    filtered_explanation = [(symptom, weight) for symptom, weight in explanation.as_list(label=explanation.available_labels()[0]) if weight > 0.001 or weight < -0.001 or symptom in symptoms_request]
+    # Filter out features with importance between -0.0001 and 0.0001 (inclusive), except for the custom symptoms
+    filtered_explanation = [(symptom, weight) for symptom, weight in explanation.as_list(label=explanation.available_labels()[0]) if weight > 0.0001 or weight < -0.0001 or symptom in symptoms_request]
 
     # Calculate confidence level
     confidence_level = max(predicted_probabilities) * 100
@@ -82,41 +83,6 @@ def predict():
     return jsonify({
         'diagnosis': predicted_disease_custom,
         'confidence_level': confidence_level,
-        'explanation': filtered_explanation
-    })
-
-    # Get symptoms from request
-    symptoms_request = request.json['symptoms']
-    # Encode the symptoms into a binary vector
-    input_vector = np.array([1 if symptom in symptoms_request else 0 for symptom in symptoms]).reshape(1, -1)
-    # Use the trained model to predict probabilities for the symptoms
-    predicted_probabilities = loaded_rf_model.predict_proba(input_vector)[0]
-
-    # Predicted disease for custom symptoms
-    predicted_disease_custom = inv_mapping[np.argmax(predicted_probabilities)]
-
-    # Explanation using LIME
-    explainer = lime_tabular.LimeTabularExplainer(training_data=np.zeros((1, len(symptoms))),
-                                                   feature_names=symptoms,
-                                                   class_names=list(inv_mapping.values()),
-                                                   mode="classification")
-
-    # Define a function to make predictions with your model
-    def predict_fn(x):
-        return loaded_rf_model.predict_proba(x)
-
-    # Get the explanation for the predicted class
-    explanation = explainer.explain_instance(data_row=input_vector[0],
-                                             predict_fn=predict_fn,
-                                             num_features=len(symptoms),
-                                             top_labels=1)
-
-    # Filter out features with importance between -0.001 and 0.001 (inclusive), except for the custom symptoms
-    filtered_explanation = [(symptom, weight) for symptom, weight in explanation.as_list(label=explanation.available_labels()[0]) if weight > 0.001 or weight < -0.001 or symptom in symptoms_request]
-
-    # Return the predicted disease and explanation
-    return jsonify({
-        'diagnosis': predicted_disease_custom,
         'explanation': filtered_explanation
     })
 
