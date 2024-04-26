@@ -48,6 +48,11 @@ def index():
 def predict():
     # Get symptoms from request
     symptoms_request = request.json['symptoms']
+
+    # Check if any symptoms are selected
+    if not symptoms_request:
+        return jsonify({'error': 'No symptoms selected'}), 400  # Return error response with status code 400
+
     # Encode the symptoms into a binary vector
     input_vector = np.array([1 if symptom in symptoms_request else 0 for symptom in symptoms]).reshape(1, -1)
 

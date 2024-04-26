@@ -146,18 +146,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function predictDisease() {
         console.log('Predicting disease...');
-
+        // Get selected symptoms
+        const selectedSymptoms = Array.from(document.querySelectorAll('.selected-symptom-box'));
+        const symptoms = selectedSymptoms.map(symptomBox => symptomBox.textContent.trim());
+    
         // Show loading indicator
         const loadingIndicator = document.getElementById('loading-indicator');
         loadingIndicator.style.display = 'block';
-
+    
         try {
-            // Get selected symptoms
-            const selectedSymptoms = Array.from(document.querySelectorAll('.selected-symptom-box'));
-            const symptoms = selectedSymptoms.map(symptomBox => symptomBox.textContent.trim());
-
-            console.log('Symptoms:', symptoms);
-
+            // Check if there are any selected symptoms
+            if (symptoms.length === 0) {
+                // Display a warning message
+                document.getElementById('result').textContent = 'Please select at least one symptom.';
+                // Hide loading indicator
+                loadingIndicator.style.display = 'none';
+                return; // Exit the function
+            }
+    
             // Fetch prediction
             const response = await fetch('/predict', {
                 method: 'POST',
@@ -166,28 +172,35 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 body: JSON.stringify({ symptoms })
             });
-
+    
+            // Check if the response is successful
+            if (!response.ok) {
+                throw new Error('Prediction request failed.');
+            }
+    
             // Parse response and handle prediction
             const result = await response.json();
-
+    
             console.log('Prediction response:', result);
-
+    
             // Hide loading indicator
             loadingIndicator.style.display = 'none';
-
-            // Check if the response contains the 'diagnoses' array
-            if (result.diagnoses && Array.isArray(result.diagnoses) && result.diagnoses.length > 0) {
-                // Extract the first diagnosis and its confidence level
-                const [diagnosis, confidenceLevel] = result.diagnoses[0];
-
+    
+            // Check if the response contains the 'diagnosis' and 'confidence_level' properties
+            if (result.diagnosis && result.confidence_level) {
                 // Display the diagnosis and confidence level
                 document.getElementById('result').innerHTML = `
-                    <p>Diagnosis: ${diagnosis}</p>
-                    <p>Confidence Level: ${confidenceLevel * 100}</p>
+                    <p>Diagnosis: ${result.diagnosis}</p>
+                    <p>Confidence Level: ${result.confidence_level}</p>
                 `;
+                // Display explanation if available
+                if (result.explanation) {
+                    const explanationHTML = result.explanation.map(([symptom, weight]) => `<p>${symptom}: ${weight}</p>`).join('');
+                    document.getElementById('result').innerHTML += `<div><h3>Explanation:</h3>${explanationHTML}</div>`;
+                }
             } else {
-                // Handle case when 'diagnoses' array is missing or empty
-                document.getElementById('result').textContent = 'No diagnoses found.';
+                // Handle case when 'diagnosis' and 'confidence_level' are not provided
+                document.getElementById('result').textContent = 'Prediction request failed. Please try again.';
             }
         } catch (error) {
             console.error('Prediction request failed:', error);
@@ -197,7 +210,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('result').textContent = 'Error predicting disease. Please try again.';
         }
     }
-
+    
     // Attach event listener to predict button
     document.getElementById('predict-btn').addEventListener('click', predictDisease);
 
